@@ -4,6 +4,7 @@ const app = express();
 const MongoClient = require('mongodb').MongoClient;
 
 app.use(bodyParser.urlencoded({extended: true}));
+app.set('view engine', 'ejs');
 
 let db;
 
@@ -16,7 +17,10 @@ MongoClient.connect('mongodb://localhost:27017/nodetest1', (err, database) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/views/index.html');
+  const cursor = db.collection('quotes').find().toArray((err, results) => {
+    if(err) return console.log(err);
+    res.render('index.ejs', {quotes: results});
+  });
 });
 
 app.post('/quotes', (req, res) => {
